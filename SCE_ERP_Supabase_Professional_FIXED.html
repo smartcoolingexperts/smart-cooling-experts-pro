@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Smart Cooling Experts — Pro ERP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+ --navy:#071d3b;--blue:#1769e0;--cyan:#11b8e6;--purple:#6d5dfc;--green:#079455;
+ --red:#d92d20;--orange:#f79009;--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#667085;
+ --line:#e4e9f0;--shadow:0 12px 35px rgba(16,24,40,.08);--radius:18px
+}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f6f9ff,#eef4fb);color:var(--text);font-family:Inter,Arial,Helvetica,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.hidden{display:none!important}.top{position:sticky;top:0;z-index:50;color:#fff;padding:15px 18px;background:linear-gradient(110deg,#061a35,#0b3b77 55%,#1769e0);box-shadow:0 8px 25px rgba(7,29,59,.18)}
+.topbar{max-width:1450px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:20px;font-weight:950;letter-spacing:.5px}.sub{font-size:11px;opacity:.82;margin-top:3px}.userbox{display:flex;align-items:center;gap:8px;font-size:11px}.avatar{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25)}
+.wrap{max-width:1450px;margin:auto;padding:15px}.layout{display:grid;grid-template-columns:225px 1fr;gap:15px}.side{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:20px;padding:10px;height:max-content;position:sticky;top:82px;box-shadow:var(--shadow)}
+.nav{width:100%;text-align:left;border:0;background:transparent;padding:11px 12px;border-radius:11px;font-weight:800;color:#344054;margin-bottom:3px;transition:.2s}.nav:hover{background:#eef5ff;color:var(--blue);transform:translateX(2px)}.nav.active{background:linear-gradient(100deg,#eaf2ff,#f0edff);color:var(--blue);box-shadow:inset 3px 0 var(--blue)}
+.main{min-width:0}.page{display:none;animation:pageIn .3s ease}.page.active{display:block}@keyframes pageIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.card{background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin-bottom:15px;box-shadow:var(--shadow)}
+.hero{background:linear-gradient(120deg,#071d3b,#0d4f9b 55%,#6d5dfc);color:#fff;border:0;overflow:hidden;position:relative}.hero:after{content:"";position:absolute;width:250px;height:250px;border-radius:50%;right:-80px;top:-120px;background:rgba(255,255,255,.12)}
+h2{font-size:21px;margin:0 0 6px}h3{font-size:15px;margin:15px 0 9px}.hint{font-size:12px;color:var(--muted);line-height:1.5}.hero .hint{color:rgba(255,255,255,.78)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+label{font-size:11px;font-weight:850;color:#596273;display:block;margin:8px 0 5px}input,select,textarea{width:100%;padding:11px 12px;border:1px solid #d7deea;border-radius:10px;background:#fff;font-size:13px;outline:none;transition:.2s}input:focus,select:focus,textarea:focus{border-color:#72a5ef;box-shadow:0 0 0 4px rgba(23,105,224,.09)}textarea{min-height:80px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1;min-width:135px}.btn{border:0;border-radius:10px;padding:11px 13px;font-weight:850;transition:.2s}.btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(16,24,40,.12)}.primary{background:linear-gradient(100deg,#1769e0,#6d5dfc);color:#fff}.secondary{background:#edf3fb;color:#1457bd}.success{background:#e9fbf2;color:#067647}.danger{background:#fff0ef;color:#b42318}.dark{background:#071d3b;color:#fff}.wide{width:100%}
+.msg{display:none;padding:11px 13px;border-radius:11px;font-size:12px;margin-bottom:12px}.msg.show{display:block}.msg.ok{background:#ecfdf3;color:#067647;border:1px solid #abefc6}.msg.err{background:#fff1f0;color:#b42318;border:1px solid #fecdca}.msg.load{background:#eef5ff;color:#175cd3}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#fff;border:1px solid var(--line);border-radius:15px;padding:15px;box-shadow:var(--shadow);position:relative;overflow:hidden}.stat:after{content:"";position:absolute;width:70px;height:70px;border-radius:50%;right:-25px;top:-25px;background:#eef5ff}.stat b{display:block;font-size:25px;position:relative;z-index:1}.stat span{font-size:11px;color:var(--muted)}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.table{width:100%;border-collapse:collapse;min-width:700px}.table th,.table td{padding:9px 10px;border-bottom:1px solid var(--line);font-size:11px;text-align:left;white-space:nowrap}.table th{background:#f8fafc;font-weight:900;position:sticky;top:0}.badge{display:inline-block;padding:5px 8px;border-radius:999px;background:#eaf2ff;color:#175cd3;font-weight:850;font-size:10px}.badge.ok{background:#ecfdf3;color:#067647}.badge.warn{background:#fff7e6;color:#b54708}.badge.bad{background:#fff0ef;color:#b42318}
+.result{border:1px solid #cfe0fb;background:linear-gradient(135deg,#f8fbff,#f7f4ff);border-radius:15px;padding:14px;margin-top:12px}.resultgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.kv{padding:9px;background:#fff;border:1px solid var(--line);border-radius:10px}.kv small{display:block;color:var(--muted);font-weight:800;font-size:10px}.kv b{display:block;margin-top:3px;font-size:12px;word-break:break-word}
+#reader{max-width:480px;margin:12px auto}.qrbox{text-align:center;padding:12px}.qrbox canvas,.qrbox img{max-width:230px;margin:auto;border-radius:10px}
+.modal{position:fixed;inset:0;background:rgba(3,12,28,.62);backdrop-filter:blur(8px);display:none;place-items:center;z-index:100;padding:18px}.modal.show{display:grid}.modalbox{background:#fff;border-radius:22px;max-width:520px;width:100%;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:pop .3s ease}@keyframes pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.successAnim{text-align:center;padding:12px}.check{width:84px;height:84px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#12b76a,#079455);box-shadow:0 0 0 10px #e9fbf2;animation:checkPulse 1.2s ease}.check:after{content:"✓";font-size:48px;color:#fff;font-weight:900;animation:checkIn .45s .2s both}@keyframes checkPulse{50%{transform:scale(1.06);box-shadow:0 0 0 18px rgba(18,183,106,.08)}}@keyframes checkIn{from{opacity:0;transform:scale(.4) rotate(-25deg)}to{opacity:1;transform:none}}.otp{display:flex;justify-content:center;gap:7px;margin:14px 0}.otp span{width:38px;height:45px;border-radius:9px;background:#eef5ff;color:#175cd3;display:grid;place-items:center;font-weight:950;font-size:17px;animation:otpIn .35s both}.otp span:nth-child(2){animation-delay:.05s}.otp span:nth-child(3){animation-delay:.1s}.otp span:nth-child(4){animation-delay:.15s}.otp span:nth-child(5){animation-delay:.2s}.otp span:nth-child(6){animation-delay:.25s}@keyframes otpIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.toast{position:fixed;right:16px;bottom:16px;z-index:120;min-width:250px;max-width:360px;padding:13px 15px;border-radius:13px;color:#fff;background:#071d3b;box-shadow:0 15px 40px rgba(0,0,0,.2);display:none}.toast.show{display:block;animation:toastIn .3s}@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.footer{text-align:center;color:#7a8494;font-size:10px;padding:20px}.mobileMenu{display:none}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side{position:static;display:flex;overflow:auto;gap:4px}.nav{min-width:145px}.stats{grid-template-columns:repeat(2,1fr)}.grid4{grid-template-columns:repeat(2,1fr)}.mobileMenu{display:block}}
+@media(max-width:600px){.wrap{padding:9px}.card{padding:13px}.grid,.grid3,.grid4,.stats,.resultgrid{grid-template-columns:1fr}.brand{font-size:17px}.userbox span{display:none}.side{border-radius:13px}.nav{min-width:135px}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="topbar">
+  <div><div class="brand">SMART COOLING EXPERTS</div><div class="sub">Premium Service • Sales • Warranty • Tracking • ERP</div></div>
+  <div class="userbox"><span id="userEmail">Not signed in</span><div class="avatar">SCE</div><button id="logoutBtn" class="btn secondary hidden" onclick="logout()">Logout</button></div>
+ </div>
+</header>
+
+<div id="loginModal" class="modal show">
+ <div class="modalbox">
+  <div class="successAnim" style="padding-top:0"><div class="check" style="width:65px;height:65px"><span style="display:none"></span></div></div>
+  <h2 style="text-align:center">Smart Cooling Experts</h2>
+  <p class="hint" style="text-align:center">Owner / Admin secure access</p>
+  <div id="loginMsg" class="msg"></div>
+  <label>Email</label><input id="loginEmail" type="email" placeholder="Owner email">
+  <label>Password</label><input id="loginPassword" type="password" placeholder="Password">
+  <div class="actions"><button class="btn primary wide" onclick="login()">Secure Login</button></div>
+  <p class="hint" style="text-align:center;margin-top:10px">Your Supabase RLS policies remain the final access control.</p>
+ </div>
+</div>
+
+<div class="wrap">
+<div class="layout">
+<aside class="side">
+ <button class="nav active" data-page="dashboard">📊 Dashboard</button>
+ <button class="nav" data-page="booking">📅 Bookings</button>
+ <button class="nav" data-page="tracking">🔎 Tracking / QR</button>
+ <button class="nav" data-page="service">🛠 Service Job</button>
+ <button class="nav" data-page="invoice">🧾 Invoice</button>
+ <button class="nav" data-page="sale">🛒 Sales</button>
+ <button class="nav" data-page="customer">👤 Customers</button>
+ <button class="nav" data-page="payment">💰 Payments</button>
+ <button class="nav" data-page="warranty">🛡 Warranty</button>
+ <button class="nav" data-page="photos">📸 Photos</button>
+ <button class="nav" data-page="inventory">📦 Inventory</button>
+ <button class="nav" data-page="technician">👨‍🔧 Technicians</button>
+ <button class="nav" data-page="live">📍 Live Location</button>
+ <button class="nav" data-page="system">⚙️ System</button>
+</aside>
+
+<main class="main">
+<div id="globalMsg" class="msg"></div>
+
+<section id="page-dashboard" class="page active">
+ <div class="card hero"><h2>Owner / Admin Dashboard</h2><div class="hint">Real-time overview connected directly to your Supabase database.</div><div class="actions"><button class="btn secondary" onclick="refreshDashboard()">↻ Refresh Data</button><button class="btn secondary" onclick="go('tracking')">Open Tracking</button></div></div>
+ <div class="stats" id="stats"></div>
+ <div class="card"><h3>Recent Jobs</h3><div id="recentJobs" class="tablewrap"></div></div>
+</section>
+
+<section id="page-booking" class="page">
+ <div class="card"><h2>Bookings</h2><div class="hint">Google Form/public bookings can be stored here. Admin can also create a booking manually.</div>
+  <div class="grid">
+   <div><label>Customer Name *</label><input id="b_name"></div><div><label>Phone</label><input id="b_phone"></div>
+   <div><label>Service Type</label><select id="b_service"><option>AC</option><option>Refrigerator</option><option>Washing Machine</option><option>Microwave</option><option>Geyser</option><option>Water Dispenser</option><option>CCTV / Camera</option><option>Electrical</option></select></div>
+   <div><label>Appliance / Model</label><input id="b_appliance"></div>
+   <div><label>Brand</label><input id="b_brand"></div><div><label>Area</label><input id="b_area"></div>
+   <div><label>Preferred Date</label><input id="b_date" type="date"></div><div><label>Preferred Time</label><input id="b_time"></div>
+  </div>
+  <label>Address</label><input id="b_address">
+  <label>Complaint</label><textarea id="b_complaint"></textarea>
+  <label>Customer Notes</label><textarea id="b_notes"></textarea>
+  <div class="actions"><button class="btn primary" onclick="saveBooking()">Save Booking</button><button class="btn secondary" onclick="loadBookings()">Refresh</button></div>
+ </div>
+ <div class="card"><h3>Booking List</h3><div id="bookingTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-tracking" class="page">
+ <div class="card"><h2>Tracking & QR Scanner</h2><div class="hint">Search by Tracking Code or scan an SCE QR. A verified code triggers the premium verification animation.</div>
+  <div class="grid"><div><label>Tracking Code</label><input id="trackCode" placeholder="SCE-..."></div><div class="actions" style="align-items:end"><button class="btn primary wide" onclick="searchTracking()">Search & Verify</button></div></div>
+  <div class="actions"><button class="btn secondary" onclick="showScanner()">📷 Start QR Scanner</button><button class="btn secondary" onclick="stopScanner()">Stop Camera</button></div>
+  <div id="reader" class="hidden"></div><div id="scanStatus" class="hint"></div>
+ </div>
+ <div id="trackingResult" class="card hidden"></div>
+</section>
+
+<section id="page-service" class="page">
+ <div class="card"><h2>Create / Update Service Job</h2><div class="hint">A Service Job can be linked to a booking and customer. Tracking is generated automatically if left empty.</div>
+  <div class="grid">
+   <div><label>Tracking Code</label><input id="s_tracking" placeholder="Auto generated"></div><div><label>Customer ID (optional)</label><input id="s_customer"></div>
+   <div><label>Booking ID (optional)</label><input id="s_booking"></div><div><label>Technician</label><input id="s_tech"></div>
+   <div><label>Helper</label><input id="s_helper"></div><div><label>Service Type</label><select id="s_service"><option>AC</option><option>Refrigerator</option><option>Washing Machine</option><option>Microwave</option><option>Geyser</option><option>Water Dispenser</option><option>CCTV / Camera</option><option>Electrical</option></select></div>
+   <div><label>Appliance</label><input id="s_appliance"></div><div><label>Brand</label><input id="s_brand"></div><div><label>Model</label><input id="s_model"></div>
+   <div><label>Status</label><select id="s_status"><option>Open</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select></div>
+   <div><label>Visit Charge</label><input id="s_visit" type="number" value="0"></div><div><label>Service Amount</label><input id="s_service_amount" type="number" value="0"></div>
+   <div><label>Parts Amount</label><input id="s_parts_amount" type="number" value="0"></div><div><label>Paid Amount</label><input id="s_paid" type="number" value="0"></div>
+  </div>
+  <label>Problem Description</label><textarea id="s_problem"></textarea><label>Work Done</label><textarea id="s_work"></textarea><label>Parts Used</label><textarea id="s_parts"></textarea><label>Gas Used</label><textarea id="s_gas"></textarea><label>Notes</label><textarea id="s_notes"></textarea>
+  <div class="actions"><button class="btn primary" onclick="saveServiceJob()">Save Service Job</button><button class="btn secondary" onclick="clearService()">Clear</button></div>
+ </div>
+ <div class="card"><h3>Latest Service Jobs</h3><div id="serviceTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-invoice" class="page">
+ <div class="card"><h2>Invoice</h2><div class="hint">Create a professional invoice header. Items can be added one-by-one.</div>
+  <div class="grid"><div><label>Invoice Number *</label><input id="i_number" placeholder="INV-20261004-0001"></div><div><label>Customer ID</label><input id="i_customer"></div><div><label>Service Job ID</label><input id="i_job"></div><div><label>Customer Name</label><input id="i_name"></div><div><label>Customer Phone</label><input id="i_phone"></div><div><label>Invoice Type</label><select id="i_type"><option>Service</option><option>Sale</option></select></div><div><label>Discount</label><input id="i_discount" type="number" value="0"></div><div><label>Paid Amount</label><input id="i_paid" type="number" value="0"></div><div><label>Payment Method</label><select id="i_method"><option>Cash</option><option>Bank Transfer</option><option>EasyPaisa</option><option>JazzCash</option><option>Card</option></select></div></div>
+  <label>Notes</label><textarea id="i_notes"></textarea>
+  <h3>Invoice Items</h3><div class="grid4"><input id="ii_desc" placeholder="Description"><input id="ii_qty" type="number" value="1" placeholder="Qty"><input id="ii_price" type="number" value="0" placeholder="Unit Price"><button class="btn secondary" onclick="addInvoiceItem()">+ Add Item</button></div>
+  <div id="invoiceItems" class="tablewrap" style="margin-top:10px"></div>
+  <div class="actions"><button class="btn primary" onclick="saveInvoice()">Save Invoice</button><button class="btn secondary" onclick="clearInvoice()">Clear</button></div>
+ </div>
+ <div class="card"><h3>Recent Invoices</h3><div id="invoiceTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-sale" class="page">
+ <div class="card"><h2>Sales</h2><div class="grid"><div><label>Invoice Number</label><input id="sale_invoice"></div><div><label>Customer ID</label><input id="sale_customer"></div><div><label>Customer Name</label><input id="sale_name"></div><div><label>Customer Phone</label><input id="sale_phone"></div><div><label>Subtotal</label><input id="sale_subtotal" type="number" value="0"></div><div><label>Discount</label><input id="sale_discount" type="number" value="0"></div><div><label>Paid Amount</label><input id="sale_paid" type="number" value="0"></div><div><label>Payment Method</label><select id="sale_method"><option>Cash</option><option>Bank Transfer</option><option>EasyPaisa</option><option>JazzCash</option><option>Card</option></select></div></div><label>Notes</label><textarea id="sale_notes"></textarea><div class="actions"><button class="btn primary" onclick="saveSale()">Save Sale</button><button class="btn secondary" onclick="loadSales()">Refresh</button></div></div>
+ <div class="card"><h3>Recent Sales</h3><div id="saleTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-customer" class="page">
+ <div class="card"><h2>Customers</h2><div class="grid"><div><label>Full Name *</label><input id="c_name"></div><div><label>Phone</label><input id="c_phone"></div><div><label>WhatsApp</label><input id="c_whatsapp"></div><div><label>Email</label><input id="c_email"></div><div><label>Area</label><input id="c_area"></div><div><label>City</label><input id="c_city" value="Karachi"></div></div><label>Address</label><input id="c_address"><label>Notes</label><textarea id="c_notes"></textarea><div class="actions"><button class="btn primary" onclick="saveCustomer()">Save Customer</button><button class="btn secondary" onclick="loadCustomers()">Refresh</button></div></div>
+ <div class="card"><h3>Customer List</h3><div id="customerTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-payment" class="page">
+ <div class="card"><h2>Payment Record</h2><div class="grid"><div><label>Customer ID</label><input id="p_customer"></div><div><label>Service Job ID</label><input id="p_job"></div><div><label>Invoice ID</label><input id="p_invoice"></div><div><label>Sale ID</label><input id="p_sale"></div><div><label>Reference</label><input id="p_ref"></div><div><label>Amount *</label><input id="p_amount" type="number"></div><div><label>Method</label><select id="p_method"><option>Cash</option><option>Bank Transfer</option><option>EasyPaisa</option><option>JazzCash</option><option>Card</option></select></div></div><label>Notes</label><textarea id="p_notes"></textarea><div class="actions"><button class="btn primary" onclick="savePayment()">Save Payment</button><button class="btn secondary" onclick="loadPayments()">Refresh</button></div></div>
+ <div class="card"><h3>Recent Payments</h3><div id="paymentTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-warranty" class="page">
+ <div class="card"><h2>Warranty</h2><div class="grid"><div><label>Warranty Code</label><input id="w_code" placeholder="WAR-..."></div><div><label>Tracking Code</label><input id="w_tracking"></div><div><label>Customer ID</label><input id="w_customer"></div><div><label>Service Job ID</label><input id="w_job"></div><div><label>Warranty Type</label><input id="w_type" placeholder="Service / Parts / Gas"></div><div><label>Warranty Days</label><input id="w_days" type="number" value="15"></div><div><label>Start Date</label><input id="w_start" type="date"></div><div><label>Expiry Date</label><input id="w_expiry" type="date"></div><div><label>Status</label><select id="w_status"><option>Active</option><option>Expired</option><option>Claimed</option><option>Cancelled</option></select></div></div><label>Terms</label><textarea id="w_terms"></textarea><label>Notes</label><textarea id="w_notes"></textarea><div class="actions"><button class="btn primary" onclick="saveWarranty()">Save Warranty</button><button class="btn secondary" onclick="loadWarranties()">Refresh</button></div></div>
+ <div class="card"><h3>Warranty List</h3><div id="warrantyTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-photos" class="page">
+ <div class="card"><h2>Service Photos</h2><div class="hint">Photo upload uses the Supabase Storage bucket <b>service-photos</b>. If the bucket does not exist, create it once in Storage.</div><div class="grid"><div><label>Service Job ID</label><input id="ph_job"></div><div><label>Tracking Code</label><input id="ph_tracking"></div><div><label>Photo Type</label><select id="ph_type"><option>Before</option><option>After</option><option>Parts</option><option>Invoice</option><option>Other</option></select></div><div><label>Photo</label><input id="ph_file" type="file" accept="image/*"></div></div><div class="actions"><button class="btn primary" onclick="uploadPhoto()">Upload Photo</button><button class="btn secondary" onclick="loadPhotos()">Load Photos</button></div></div>
+ <div class="card"><h3>Photo Records</h3><div id="photoTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-inventory" class="page">
+ <div class="card"><h2>Inventory / Products</h2><div class="grid"><div><label>Product Code</label><input id="pr_code"></div><div><label>Product Name *</label><input id="pr_name"></div><div><label>Category</label><input id="pr_category"></div><div><label>Brand</label><input id="pr_brand"></div><div><label>Model</label><input id="pr_model"></div><div><label>Purchase Price</label><input id="pr_purchase" type="number" value="0"></div><div><label>Sale Price</label><input id="pr_sale" type="number" value="0"></div><div><label>Stock Quantity</label><input id="pr_stock" type="number" value="0"></div><div><label>Minimum Stock</label><input id="pr_min" type="number" value="0"></div><div><label>Unit</label><input id="pr_unit" value="pcs"></div><div><label>Supplier</label><input id="pr_supplier"></div><div><label>Status</label><select id="pr_status"><option>Active</option><option>Inactive</option></select></div></div><label>Description</label><textarea id="pr_desc"></textarea><div class="actions"><button class="btn primary" onclick="saveProduct()">Save Product</button><button class="btn secondary" onclick="loadProducts()">Refresh</button></div></div>
+ <div class="card"><h3>Product List</h3><div id="productTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-technician" class="page">
+ <div class="card"><h2>Technicians</h2><div class="grid"><div><label>Technician ID *</label><input id="t_id" placeholder="TECH-001"></div><div><label>Name *</label><input id="t_name"></div><div><label>Contact</label><input id="t_phone"></div><div><label>Designation</label><input id="t_designation"></div><div><label>Joining Date</label><input id="t_joining" type="date"></div><div><label>Skills</label><input id="t_skills"></div><div><label>Status</label><select id="t_status"><option>Active</option><option>Inactive</option><option>On Leave</option></select></div></div><label>Address</label><input id="t_address"><label>Notes</label><textarea id="t_notes"></textarea><div class="actions"><button class="btn primary" onclick="saveTechnician()">Save Technician</button><button class="btn secondary" onclick="loadTechnicians()">Refresh</button></div></div>
+ <div class="card"><h3>Technician List</h3><div id="technicianTable" class="tablewrap"></div></div>
+</section>
+
+<section id="page-live" class="page">
+ <div class="card"><h2>Live Location</h2><div class="hint">The location is saved into the selected booking's <b>live_location</b> field. Browser location permission is required.</div><label>Booking ID</label><input id="loc_booking"><div class="actions"><button class="btn primary" onclick="captureLocation()">📍 Capture & Save Current Location</button><button class="btn secondary" onclick="loadBookingsForLocation()">Refresh Bookings</button></div><div id="locationMsg" class="msg"></div></div>
+</section>
+
+<section id="page-system" class="page">
+ <div class="card hero"><h2>System</h2><div class="hint">Connection, role and database health information.</div></div>
+ <div class="grid3">
+  <div class="card"><h3>Supabase</h3><div id="sysConnection" class="hint">Checking...</div></div>
+  <div class="card"><h3>Authentication</h3><div id="sysAuth" class="hint">Checking...</div></div>
+  <div class="card"><h3>Database</h3><div id="sysDb" class="hint">Checking...</div></div>
+ </div>
+ <div class="card"><h3>Important</h3><div class="hint">This single-file app uses your publishable Supabase key in the browser. That key is intended for browser use; your RLS policies must remain enabled. Never put a Supabase secret/service-role key into this HTML.</div><div class="actions"><button class="btn secondary" onclick="runDiagnostics()">Run Connection Test</button></div></div>
+</section>
+
+</main></div><div class="footer">Smart Cooling Experts • Professional ERP • Secure Supabase RLS</div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+/* =========================================================
+   SMART COOLING EXPERTS — SINGLE FILE SUPABASE ERP
+   Database: public schema supplied by the owner.
+   ========================================================= */
+const SUPABASE_URL = 'https://tcblvcifaxdygtfktqof.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_vgJIJT53kzfbiemcXRo_rA_tnmgLxuo';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+let currentUser=null, currentProfile=null, scanner=null, invoiceItems=[];
+
+const $ = id => document.getElementById(id);
+const val = id => ($(id)?.value || '').trim();
+const num = id => Number($(id)?.value || 0);
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function toast(msg,kind=''){const t=$('toast');t.textContent=msg;t.style.background=kind==='err'?'#b42318':kind==='ok'?'#067647':'#071d3b';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
+function msg(id,text,kind='ok'){const e=$(id);if(!e)return;e.textContent=text;e.className='msg show '+kind}
+function global(text,kind='ok'){msg('globalMsg',text,kind);setTimeout(()=>{$('globalMsg').classList.remove('show')},3500)}
+function fmtDate(v){if(!v)return'—';try{return new Date(v).toLocaleString('en-PK',{dateStyle:'medium',timeStyle:'short'})}catch{return String(v)}}
+function badge(v){let s=String(v||'');let k=/completed|active|paid|success/i.test(s)?'ok':/pending|open|progress/i.test(s)?'warn':/cancel|expired|inactive/i.test(s)?'bad':'';return `<span class="badge ${k}">${esc(s||'—')}</span>`}
+function table(headers,rows){if(!rows?.length)return'<div style="padding:18px;text-align:center;color:#667085;font-size:12px">No records found.</div>';return`<table class="table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`}
+function setActive(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-'+page)?.classList.add('active');document.querySelectorAll('.nav').forEach(x=>x.classList.toggle('active',x.dataset.page===page))}
+function go(page){setActive(page);const loaders={dashboard:refreshDashboard,booking:loadBookings,tracking:()=>{},service:loadServiceJobs,invoice:loadInvoices,sale:loadSales,customer:loadCustomers,payment:loadPayments,warranty:loadWarranties,photos:loadPhotos,inventory:loadProducts,technician:loadTechnicians,live:loadBookingsForLocation,system:runDiagnostics};loaders[page]?.()}
+document.querySelectorAll('.nav').forEach(b=>b.addEventListener('click',()=>go(b.dataset.page)));
+
+async function login(){
+ const email=val('loginEmail'), password=val('loginPassword');
+ if(!email||!password){msg('loginMsg','Email and password are required.','err');return}
+ msg('loginMsg','Signing in securely…','load');
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+ if(error){msg('loginMsg',error.message,'err');return}
+ await startApp(data.user);
+}
+async function logout(){await stopScanner();await db.auth.signOut();location.reload()}
+async function startApp(user){
+ currentUser=user;
+ $('userEmail').textContent=user.email||'Signed in';
+ $('logoutBtn').classList.remove('hidden');
+ const {data,error}=await db.from('user_profiles').select('*').eq('id',user.id).maybeSingle();
+ if(error||!data){toast('Profile not found or access denied.','err');await db.auth.signOut();return}
+ currentProfile=data;
+ $('loginModal').classList.remove('show');
+ if(data.role!=='admin'){toast('This ERP portal is restricted to admin users.','err');return}
+ await refreshDashboard();await runDiagnostics();
+}
+db.auth.onAuthStateChange(async(_event,session)=>{if(session?.user&&!currentUser)await startApp(session.user)});
+
+async function refreshDashboard(){
+ const [c,b,j,i,p,t,w,s] = await Promise.all([
+  db.from('customers').select('id',{count:'exact',head:true}),
+  db.from('bookings').select('id',{count:'exact',head:true}),
+  db.from('service_jobs').select('id',{count:'exact',head:true}),
+  db.from('invoices').select('id',{count:'exact',head:true}),
+  db.from('payments').select('amount'),
+  db.from('technicians').select('id',{count:'exact',head:true}),
+  db.from('warranties').select('id',{count:'exact',head:true}),
+  db.from('products').select('stock_quantity,minimum_stock')
+ ]);
+ const stats=[
+  ['Customers',c.count||0],['Bookings',b.count||0],['Service Jobs',j.count||0],['Invoices',i.count||0],
+  ['Technicians',t.count||0],['Warranties',w.count||0],['Payments',((p.data||[]).reduce((a,x)=>a+Number(x.amount||0),0)).toLocaleString()],['Low Stock',(s.data||[]).filter(x=>Number(x.stock_quantity||0)<=Number(x.minimum_stock||0)).length]
+ ];
+ $('stats').innerHTML=stats.map(x=>`<div class="stat"><b>${esc(x[1])}</b><span>${esc(x[0])}</span></div>`).join('');
+ const {data,error}=await db.from('service_jobs').select('id,job_code,service_type,appliance_type,technician,service_status,total_amount,paid_amount,created_at').order('created_at',{ascending:false}).limit(10);
+ $('recentJobs').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Job','Service','Appliance','Technician','Status','Total','Paid','Created'],(data||[]).map(r=>`<tr><td>${esc(r.job_code||r.id.slice(0,8))}</td><td>${esc(r.service_type)}</td><td>${esc(r.appliance_type)}</td><td>${esc(r.technician)}</td><td>${badge(r.service_status)}</td><td>${Number(r.total_amount||0).toLocaleString()}</td><td>${Number(r.paid_amount||0).toLocaleString()}</td><td>${fmtDate(r.created_at)}</td></tr>`))}
+}
+async function saveCustomer(){
+ const name=val('c_name');if(!name)return toast('Customer name is required.','err');
+ const {data,error}=await db.from('customers').insert({full_name:name,phone:val('c_phone'),whatsapp:val('c_whatsapp'),email:val('c_email'),address:val('c_address'),area:val('c_area'),city:val('c_city')||'Karachi',notes:val('c_notes')}).select().single();
+ if(error)return toast(error.message,'err');toast('Customer saved successfully.','ok');clearIds(['c_name','c_phone','c_whatsapp','c_email','c_address','c_area','c_notes']);loadCustomers();showVerify(data.customer_code||data.id,'CUSTOMER SAVED');
+}
+async function loadCustomers(){
+ const {data,error}=await db.from('customers').select('*').order('created_at',{ascending:false}).limit(100);
+ $('customerTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Code','Name','Phone','Area','City','Created'],(data||[]).map(r=>`<tr><td>${esc(r.customer_code||r.id.slice(0,8))}</td><td>${esc(r.full_name)}</td><td>${esc(r.phone)}</td><td>${esc(r.area)}</td><td>${esc(r.city)}</td><td>${fmtDate(r.created_at)}</td></tr>`))
+}
+async function saveBooking(){
+ const name=val('b_name');if(!name)return toast('Customer name is required.','err');
+ const payload={customer_name:name,customer_phone:val('b_phone'),service_type:val('b_service'),appliance_type:val('b_appliance'),appliance_brand:val('b_brand'),complaint:val('b_complaint'),address:val('b_address'),area:val('b_area'),city:'Karachi',booking_date:val('b_date')||null,preferred_time:val('b_time'),status:'Pending',source:'ERP',customer_notes:val('b_notes')};
+ const {data,error}=await db.from('bookings').insert(payload).select().single();
+ if(error)return toast(error.message,'err');toast('Booking created successfully.','ok');clearIds(['b_name','b_phone','b_appliance','b_brand','b_area','b_date','b_time','b_address','b_complaint','b_notes']);loadBookings();showVerify(data.booking_code||data.id,'BOOKING CREATED');
+}
+async function loadBookings(){
+ const {data,error}=await db.from('bookings').select('*').order('created_at',{ascending:false}).limit(100);
+ $('bookingTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Booking','Customer','Service','Area','Date','Status','Technician'],(data||[]).map(r=>`<tr><td>${esc(r.booking_code||r.id.slice(0,8))}</td><td>${esc(r.customer_name)}</td><td>${esc(r.service_type)}</td><td>${esc(r.area)}</td><td>${esc(r.booking_date||'')}</td><td>${badge(r.status)}</td><td>${esc(r.assigned_technician||'—')}</td></tr>`))
+}
+async function saveServiceJob(){
+ const total=num('s_visit')+num('s_service_amount')+num('s_parts_amount'), paid=num('s_paid');
+ const payload={job_code:val('s_tracking')||undefined,booking_id:val('s_booking')||null,customer_id:val('s_customer')||null,technician:val('s_tech'),helper:val('s_helper'),service_type:val('s_service'),appliance_type:val('s_appliance'),brand:val('s_brand'),model:val('s_model'),problem_description:val('s_problem'),work_done:val('s_work'),parts_used:val('s_parts'),gas_used:val('s_gas'),service_status:val('s_status'),visit_charge:num('s_visit'),service_amount:num('s_service_amount'),parts_amount:num('s_parts_amount'),total_amount:total,paid_amount:paid,balance_amount:Math.max(0,total-paid),started_at:val('s_status')==='In Progress'?new Date().toISOString():null,completed_at:val('s_status')==='Completed'?new Date().toISOString():null,notes:val('s_notes')};
+ Object.keys(payload).forEach(k=>payload[k]===undefined&&delete payload[k]);
+ const {data,error}=await db.from('service_jobs').insert(payload).select().single();
+ if(error)return toast(error.message,'err');
+ const tracking=data.job_code||('SCE-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-'+data.id.slice(0,6).toUpperCase());
+ if(!data.job_code)await db.from('service_jobs').update({job_code:tracking}).eq('id',data.id);
+ const tr={tracking_code:tracking,customer_id:data.customer_id,booking_id:data.booking_id,service_job_id:data.id,status:'Active',qr_data:location.origin+location.pathname+'?tracking='+encodeURIComponent(tracking)};
+ await db.from('tracking').upsert(tr,{onConflict:'tracking_code'});
+ toast('Service Job saved. Tracking is ready.','ok');showVerify(tracking,'SERVICE JOB CREATED');loadServiceJobs();
+}
+async function loadServiceJobs(){
+ const {data,error}=await db.from('service_jobs').select('*').order('created_at',{ascending:false}).limit(100);
+ $('serviceTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Job','Customer','Service','Technician','Status','Total','Balance'],(data||[]).map(r=>`<tr><td>${esc(r.job_code||r.id.slice(0,8))}</td><td>${esc(r.customer_id||'—')}</td><td>${esc(r.service_type)}</td><td>${esc(r.technician)}</td><td>${badge(r.service_status)}</td><td>${Number(r.total_amount||0).toLocaleString()}</td><td>${Number(r.balance_amount||0).toLocaleString()}</td></tr>`))
+}
+async function searchTracking(){
+ let code=val('trackCode');if(!code)return toast('Enter or scan a Tracking Code.','err');
+ code=code.trim();msg('scanStatus','Verifying tracking code…','load');
+ const {data:tr,error}=await db.from('tracking').select('*').eq('tracking_code',code).maybeSingle();
+ if(error||!tr){const {data:j}=await db.from('service_jobs').select('*').eq('job_code',code).maybeSingle();if(j){await showTrackingRecord(code,{tracking:{tracking_code:code,status:'Active',service_job_id:j.id},job:j});return showVerify(code,'TRACKING VERIFIED')}msg('scanStatus','Tracking code not found.','err');return toast('Invalid / unknown Tracking Code.','err')}
+ const [job,customer,warranty,payments]=await Promise.all([
+  tr.service_job_id?db.from('service_jobs').select('*').eq('id',tr.service_job_id).maybeSingle():Promise.resolve({data:null}),
+  tr.customer_id?db.from('customers').select('*').eq('id',tr.customer_id).maybeSingle():Promise.resolve({data:null}),
+  db.from('warranties').select('*').eq('tracking_code',code).order('created_at',{ascending:false}).limit(5),
+  db.from('payments').select('*').eq('service_job_id',tr.service_job_id).order('payment_date',{ascending:false}).limit(10)
+ ]);
+ await showTrackingRecord(code,{tracking:tr,job:job.data,customer:customer.data,warranties:warranty.data||[],payments:payments.data||[]});
+ showVerify(code,'TRACKING VERIFIED');msg('scanStatus','Verified successfully.','ok');
+}
+async function showTrackingRecord(code,x){
+ const j=x.job||{},c=x.customer||{},w=x.warranties||[],p=x.payments||[];
+ const url=location.origin+location.pathname+'?tracking='+encodeURIComponent(code);
+ $('trackingResult').classList.remove('hidden');
+ $('trackingResult').innerHTML=`<h3>Verified Tracking Record</h3><div class="result"><div class="resultgrid">
+ <div class="kv"><small>Tracking Code</small><b>${esc(code)}</b></div><div class="kv"><small>Status</small><b>${badge(x.tracking?.status)}</b></div>
+ <div class="kv"><small>Customer</small><b>${esc(c.full_name||'—')}</b></div><div class="kv"><small>Phone</small><b>${esc(c.phone||'—')}</b></div>
+ <div class="kv"><small>Service</small><b>${esc(j.service_type||'—')}</b></div><div class="kv"><small>Appliance</small><b>${esc(j.appliance_type||'—')} ${esc(j.brand||'')}</b></div>
+ <div class="kv"><small>Technician</small><b>${esc(j.technician||'—')}</b></div><div class="kv"><small>Work</small><b>${esc(j.work_done||'—')}</b></div>
+ <div class="kv"><small>Total</small><b>Rs. ${Number(j.total_amount||0).toLocaleString()}</b></div><div class="kv"><small>Balance</small><b>Rs. ${Number(j.balance_amount||0).toLocaleString()}</b></div>
+ </div><div class="qrbox"><div id="qrCode"></div><div class="hint">Scan this QR to open this tracking record.</div></div>
+ <h3>Warranty</h3>${w.length?w.map(a=>`<div class="kv" style="margin-bottom:6px"><b>${esc(a.warranty_code||'Warranty')}</b> — ${esc(a.warranty_type)} — ${esc(a.warranty_days)} days — ${badge(a.status)}</div>`).join(''):'<div class="hint">No warranty record found.</div>'}
+ <h3>Payments</h3>${p.length?table(['Reference','Amount','Method','Date'],p.map(a=>`<tr><td>${esc(a.payment_reference)}</td><td>Rs. ${Number(a.amount||0).toLocaleString()}</td><td>${esc(a.payment_method)}</td><td>${fmtDate(a.payment_date)}</td></tr>`)):'<div class="hint">No payments found.</div>'}
+ </div>`;
+ new QRCode($('qrCode'),{text:url,width:220,height:220,colorDark:'#071d3b',colorLight:'#ffffff'});
+}
+function showVerify(code,title='VERIFIED'){
+ const m=document.createElement('div');m.className='modal show';m.innerHTML=`<div class="modalbox"><div class="successAnim"><div class="check"></div><h2>${esc(title)}</h2><div class="otp">${String(code).slice(-6).split('').map(x=>`<span>${esc(x)}</span>`).join('')}</div><div class="hint">Secure record matched successfully.</div><div class="actions"><button class="btn primary wide">Continue</button></div></div></div>`;document.body.appendChild(m);m.querySelector('button').onclick=()=>m.remove();setTimeout(()=>m.remove(),5200)
+}
+async function showScanner(){
+ $('reader').classList.remove('hidden');$('scanStatus').textContent='Requesting camera…';
+ try{
+  scanner=new Html5Qrcode('reader');
+  await scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:250}},async text=>{
+   $('trackCode').value=parseTracking(text);$('scanStatus').textContent='QR detected. Verifying…';await stopScanner();searchTracking();
+  });
+  $('scanStatus').textContent='Camera active — point at the SCE QR.';
+ }catch(e){$('scanStatus').textContent='Camera could not start: '+e.message;toast('Camera permission or browser issue.','err')}
+}
+function parseTracking(text){try{const u=new URL(text);return u.searchParams.get('tracking')||text.trim()}catch{return text.trim()}}
+async function stopScanner(){if(scanner){try{await scanner.stop()}catch{}try{scanner.clear()}catch{}scanner=null}$('reader')?.classList.add('hidden')}
+
+async function saveInvoice(){
+ const number=val('i_number');if(!number)return toast('Invoice number is required.','err');if(!invoiceItems.length)return toast('Add at least one invoice item.','err');
+ const subtotal=invoiceItems.reduce((a,x)=>a+x.total_price,0),discount=num('i_discount'),total=Math.max(0,subtotal-discount),paid=num('i_paid');
+ const payload={invoice_number:number,customer_id:val('i_customer')||null,service_job_id:val('i_job')||null,customer_name:val('i_name'),customer_phone:val('i_phone'),invoice_type:val('i_type'),subtotal,discount,total_amount:total,paid_amount:paid,balance_amount:Math.max(0,total-paid),payment_method:val('i_method'),payment_status:paid>=total?'Paid':paid>0?'Partial':'Pending',notes:val('i_notes')};
+ const {data,error}=await db.from('invoices').insert(payload).select().single();if(error)return toast(error.message,'err');
+ const {error:itemErr}=await db.from('invoice_items').insert(invoiceItems.map(x=>({...x,invoice_id:data.id})));if(itemErr)return toast(itemErr.message,'err');
+ toast('Invoice saved successfully.','ok');showVerify(number,'INVOICE SAVED');clearInvoice();loadInvoices();
+}
+function addInvoiceItem(){const d=val('ii_desc'),q=Number(val('ii_qty')||1),p=Number(val('ii_price')||0);if(!d)return toast('Enter item description.','err');invoiceItems.push({item_type:'Service',description:d,quantity:q,unit_price:p,total_price:q*p});renderInvoiceItems();['ii_desc','ii_qty','ii_price'].forEach(x=>$(x).value=x==='ii_qty'?'1':'')}
+function renderInvoiceItems(){$('invoiceItems').innerHTML=table(['Description','Qty','Unit Price','Total',''],invoiceItems.map((x,i)=>`<tr><td>${esc(x.description)}</td><td>${x.quantity}</td><td>Rs. ${x.unit_price.toLocaleString()}</td><td>Rs. ${x.total_price.toLocaleString()}</td><td><button class="btn danger" onclick="invoiceItems.splice(${i},1);renderInvoiceItems()">Remove</button></td></tr>`))}
+function clearInvoice(){invoiceItems=[];renderInvoiceItems();clearIds(['i_number','i_customer','i_job','i_name','i_phone','i_notes']);$('i_discount').value=0;$('i_paid').value=0}
+async function loadInvoices(){const {data,error}=await db.from('invoices').select('*').order('invoice_date',{ascending:false}).limit(100);$('invoiceTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Invoice','Customer','Total','Paid','Balance','Status','Date'],(data||[]).map(r=>`<tr><td>${esc(r.invoice_number)}</td><td>${esc(r.customer_name)}</td><td>Rs. ${Number(r.total_amount||0).toLocaleString()}</td><td>Rs. ${Number(r.paid_amount||0).toLocaleString()}</td><td>Rs. ${Number(r.balance_amount||0).toLocaleString()}</td><td>${badge(r.payment_status)}</td><td>${fmtDate(r.invoice_date)}</td></tr>`))}
+
+async function saveSale(){
+ const subtotal=num('sale_subtotal'),discount=num('sale_discount'),paid=num('sale_paid'),total=Math.max(0,subtotal-discount);
+ const {data,error}=await db.from('sales').insert({invoice_number:val('sale_invoice')||null,customer_id:val('sale_customer')||null,customer_name:val('sale_name'),customer_phone:val('sale_phone'),subtotal,discount,total_amount:total,paid_amount:paid,balance_amount:Math.max(0,total-paid),payment_method:val('sale_method'),payment_status:paid>=total?'Paid':paid>0?'Partial':'Pending',notes:val('sale_notes')}).select().single();
+ if(error)return toast(error.message,'err');toast('Sale saved successfully.','ok');showVerify(data.invoice_number||data.id.slice(0,8),'SALE SAVED');loadSales()
+}
+async function loadSales(){const {data,error}=await db.from('sales').select('*').order('sale_date',{ascending:false}).limit(100);$('saleTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Invoice','Customer','Subtotal','Total','Paid','Balance','Status'],(data||[]).map(r=>`<tr><td>${esc(r.invoice_number||r.id.slice(0,8))}</td><td>${esc(r.customer_name)}</td><td>Rs. ${Number(r.subtotal||0).toLocaleString()}</td><td>Rs. ${Number(r.total_amount||0).toLocaleString()}</td><td>Rs. ${Number(r.paid_amount||0).toLocaleString()}</td><td>Rs. ${Number(r.balance_amount||0).toLocaleString()}</td><td>${badge(r.payment_status)}</td></tr>`))}
+
+async function savePayment(){
+ const amount=num('p_amount');if(amount<=0)return toast('Enter a valid payment amount.','err');
+ const {data,error}=await db.from('payments').insert({customer_id:val('p_customer')||null,service_job_id:val('p_job')||null,invoice_id:val('p_invoice')||null,sale_id:val('p_sale')||null,payment_reference:val('p_ref'),amount,payment_method:val('p_method'),notes:val('p_notes')}).select().single();
+ if(error)return toast(error.message,'err');toast('Payment saved.','ok');showVerify(data.payment_reference||data.id.slice(0,6),'PAYMENT SAVED');loadPayments()
+}
+async function loadPayments(){const {data,error}=await db.from('payments').select('*').order('payment_date',{ascending:false}).limit(100);$('paymentTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Reference','Amount','Method','Customer','Date'],(data||[]).map(r=>`<tr><td>${esc(r.payment_reference||r.id.slice(0,8))}</td><td>Rs. ${Number(r.amount||0).toLocaleString()}</td><td>${esc(r.payment_method)}</td><td>${esc(r.customer_id||'—')}</td><td>${fmtDate(r.payment_date)}</td></tr>`))}
+
+async function saveWarranty(){
+ const tracking=val('w_tracking'),days=num('w_days');let start=val('w_start');if(!start)start=new Date().toISOString().slice(0,10);let expiry=val('w_expiry');if(!expiry){const d=new Date(start);d.setDate(d.getDate()+days);expiry=d.toISOString().slice(0,10)}
+ const {data,error}=await db.from('warranties').insert({warranty_code:val('w_code')||('WAR-'+Date.now().toString().slice(-8)),tracking_code:tracking||null,customer_id:val('w_customer')||null,service_job_id:val('w_job')||null,warranty_type:val('w_type'),warranty_days:days,start_date:start,expiry_date:expiry,status:val('w_status'),terms:val('w_terms'),notes:val('w_notes')}).select().single();
+ if(error)return toast(error.message,'err');toast('Warranty saved.','ok');showVerify(data.warranty_code,'WARRANTY SAVED');loadWarranties()
+}
+async function loadWarranties(){const {data,error}=await db.from('warranties').select('*').order('created_at',{ascending:false}).limit(100);$('warrantyTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Warranty','Tracking','Type','Days','Start','Expiry','Status'],(data||[]).map(r=>`<tr><td>${esc(r.warranty_code)}</td><td>${esc(r.tracking_code)}</td><td>${esc(r.warranty_type)}</td><td>${r.warranty_days}</td><td>${esc(r.start_date)}</td><td>${esc(r.expiry_date)}</td><td>${badge(r.status)}</td></tr>`))}
+
+async function saveProduct(){
+ const name=val('pr_name');if(!name)return toast('Product name is required.','err');
+ const {data,error}=await db.from('products').insert({product_code:val('pr_code')||null,product_name:name,category:val('pr_category'),brand:val('pr_brand'),model:val('pr_model'),purchase_price:num('pr_purchase'),sale_price:num('pr_sale'),stock_quantity:num('pr_stock'),minimum_stock:num('pr_min'),unit:val('pr_unit')||'pcs',supplier:val('pr_supplier'),description:val('pr_desc'),status:val('pr_status')}).select().single();
+ if(error)return toast(error.message,'err');toast('Product saved.','ok');showVerify(data.product_code||data.id.slice(0,6),'PRODUCT SAVED');loadProducts()
+}
+async function loadProducts(){const {data,error}=await db.from('products').select('*').order('created_at',{ascending:false}).limit(200);$('productTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['Code','Product','Category','Brand','Stock','Min','Sale Price','Status'],(data||[]).map(r=>`<tr><td>${esc(r.product_code||r.id.slice(0,8))}</td><td>${esc(r.product_name)}</td><td>${esc(r.category)}</td><td>${esc(r.brand)}</td><td>${r.stock_quantity}</td><td>${r.minimum_stock}</td><td>Rs. ${Number(r.sale_price||0).toLocaleString()}</td><td>${badge(r.status)}</td></tr>`))}
+
+async function saveTechnician(){
+ const id=val('t_id'),name=val('t_name');if(!id||!name)return toast('Technician ID and name are required.','err');
+ const {data,error}=await db.from('technicians').insert({technician_id:id,technician_name:name,contact_number:val('t_phone'),designation:val('t_designation'),joining_date:val('t_joining')||null,skills_specialization:val('t_skills'),address:val('t_address'),status:val('t_status'),notes:val('t_notes')}).select().single();
+ if(error)return toast(error.message,'err');toast('Technician saved.','ok');showVerify(id,'TECHNICIAN SAVED');loadTechnicians()
+}
+async function loadTechnicians(){const {data,error}=await db.from('technicians').select('*').order('created_at',{ascending:false}).limit(100);$('technicianTable').innerHTML=error?`<div style="padding:15px;color:#b42318">${esc(error.message)}</div>`:table(['ID','Name','Contact','Designation','Skills','Status'],(data||[]).map(r=>`<tr><td>${esc(r.technician_id)}</td><td>${esc(r.technician_name)}</td><td>${esc(r.contact_number)}</td><td>${esc(r.designation)}</td><td>${esc(r.skills_specialization)}</td><td>${badge(r.status)}</td></tr>`))}
+
+async function uploadPhoto(){
+ const file=$('ph_file').files[0];if(!file)return toast('Select a photo first.','err');
+ const path=`${val('ph_tracking')||'untracked'}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+ const {error}=await db.storage.from('service-photos').upload(path,file,{upsert:false,contentType:file.type});if(error)return toast(error.message+' — check Storage bucket "service-photos".','err');
+ const {data}=db.storage.from('service-photos').getPublicUrl(path);toast('Photo uploaded.','ok');
+ $('ph_file').value='';await loadPhotos(data.publicUrl)
+}
+async function loadPhotos(url){
+ if(url){$('photoTable').innerHTML=table(['Tracking','Type','Photo'],[`<tr><td>${esc(val('ph_tracking'))}</td><td>${esc(val('ph_type'))}</td><td><a href="${esc(url)}" target="_blank">Open Photo</a></td></tr>`]);return}
+ $('photoTable').innerHTML='<div style="padding:15px;color:#667085">Photos are stored in Supabase Storage. Enter a tracking code after upload to review its folder.</div>'
+}
+
+async function captureLocation(){
+ const booking=val('loc_booking');if(!booking)return toast('Enter Booking ID.','err');msg('locationMsg','Requesting location permission…','load');
+ if(!navigator.geolocation)return msg('locationMsg','Geolocation is not supported by this browser.','err');
+ navigator.geolocation.getCurrentPosition(async pos=>{
+  const live=`${pos.coords.latitude},${pos.coords.longitude}`;
+  const {error}=await db.from('bookings').update({live_location:live,updated_at:new Date().toISOString()}).eq('id',booking);
+  if(error)return msg('locationMsg',error.message,'err');msg('locationMsg','Location saved successfully: '+live,'ok');toast('Live location saved.','ok')
+ },e=>msg('locationMsg','Location permission failed: '+e.message,'err'),{enableHighAccuracy:true,timeout:15000,maximumAge:0})
+}
+async function loadBookingsForLocation(){const {data,error}=await db.from('bookings').select('id,booking_code,customer_name,assigned_technician,live_location').order('created_at',{ascending:false}).limit(100);if(error)return msg('locationMsg',error.message,'err');$('locationMsg').innerHTML='<div class="tablewrap">'+table(['Booking','Customer','Technician','Live Location'],(data||[]).map(r=>`<tr><td>${esc(r.booking_code||r.id.slice(0,8))}</td><td>${esc(r.customer_name)}</td><td>${esc(r.assigned_technician||'—')}</td><td>${esc(r.live_location||'—')}</td></tr>`))+'</div>'}
+
+async function runDiagnostics(){
+ $('sysConnection').textContent='Connected to '+SUPABASE_URL;
+ if(currentUser){$('sysAuth').innerHTML=`Signed in as <b>${esc(currentUser.email)}</b><br>Role: <b>${esc(currentProfile?.role||'unknown')}</b>`}else $('sysAuth').textContent='Not signed in';
+ const {error}=await db.from('user_profiles').select('id').limit(1);$('sysDb').innerHTML=error?`<span style="color:#b42318">${esc(error.message)}</span>`:'Database query successful ✓';
+}
+
+function clearIds(ids){ids.forEach(id=>{if($(id))$(id).value=''})}
+function clearService(){clearIds(['s_tracking','s_customer','s_booking','s_tech','s_helper','s_appliance','s_brand','s_model','s_problem','s_work','s_parts','s_gas','s_notes']);$('s_visit').value=0;$('s_service_amount').value=0;$('s_parts_amount').value=0;$('s_paid').value=0;$('s_status').value='Open'}
+function qsTracking(){const p=new URLSearchParams(location.search),c=p.get('tracking');if(c){go('tracking');$('trackCode').value=c;setTimeout(searchTracking,400)}}
+(async()=>{const {data}=await db.auth.getSession();if(data.session?.user)await startApp(data.session.user);qsTracking()})();
+</script>
+</body>
+</html>
