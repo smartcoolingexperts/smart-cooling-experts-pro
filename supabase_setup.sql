@@ -1,7 +1,6 @@
--- SMART COOLING EXPERTS — SUPABASE FOUNDATION
--- یہ SQL موجودہ منصوبے کے لیے بنیادی جدولیں بناتا ہے۔
--- اسے اپنے Supabase SQL Editor میں صرف ایک بار چلائیں۔
--- RLS پالیسیوں کو اپنی ضرورت کے مطابق review کریں۔
+-- SMART COOLING EXPERTS — SAFE SUPABASE FOUNDATION
+-- اس ورژن میں عوامی Tracking کے لیے مکمل Service/Customer جدول کھلا نہیں رکھا گیا۔
+-- پہلے والی SQL فائل استعمال نہ کریں۔
 
 create extension if not exists pgcrypto;
 
@@ -70,37 +69,33 @@ create table if not exists inventory (
 );
 
 create table if not exists service_photos (
- id uuid primary key default gen_random_uuid(),
- tracking_code text not null, photo_type text, url text, storage_path text, uploaded_by uuid,
- created_at timestamptz not null default now()
+ id uuid primary key default gen_random_uuid(), tracking_code text not null, photo_type text,
+ url text, storage_path text, uploaded_by uuid, created_at timestamptz not null default now()
 );
 
 create table if not exists live_locations (
- id uuid primary key default gen_random_uuid(),
- tracking_code text not null, technician_id text, status text, latitude double precision,
- longitude double precision, accuracy double precision, created_at timestamptz not null default now()
-);
-
-create table if not exists activity_logs (
- id uuid primary key default gen_random_uuid(),
- user_id uuid, user_email text, role text, action text, module text, details jsonb,
+ id uuid primary key default gen_random_uuid(), tracking_code text not null, technician_id text,
+ status text, latitude double precision, longitude double precision, accuracy double precision,
  created_at timestamptz not null default now()
 );
 
-create or replace view tracking_records as
-select
- tracking_code, status, service_type, appliance, brand, model,
- warranty_days, null::date as warranty_end, customer_name, phone, area, address,
- created_at, updated_at
-from service_jobs
-union all
-select
- tracking_code, 'SALE' as status, category as service_type, product as appliance, brand, model,
- null::integer as warranty_days, null::date as warranty_end, customer_name, phone, null as area, null as address,
- created_at, created_at as updated_at
-from sales;
+create table if not exists activity_logs (
+ id uuid primary key default gen_random_uuid(), user_id uuid, user_email text, role text,
+ action text, module text, details jsonb, created_at timestamptz not null default now()
+);
 
--- Public tracking must be intentionally limited.
+-- عوامی Tracking View: صرف وہ معلومات جو کسٹمر کو دکھائی جا سکتی ہیں۔
+drop view if exists public.tracking_records;
+create view public.tracking_records as
+select tracking_code, status, service_type, appliance, brand, model,
+       warranty_days, null::date as warranty_end, created_at, updated_at
+from public.service_jobs
+union all
+select tracking_code, 'SALE'::text as status, category as service_type,
+       product as appliance, brand, model, null::integer as warranty_days,
+       null::date as warranty_end, created_at, created_at as updated_at
+from public.sales;
+
 alter table profiles enable row level security;
 alter table customers enable row level security;
 alter table technicians enable row level security;
@@ -113,55 +108,74 @@ alter table service_photos enable row level security;
 alter table live_locations enable row level security;
 alter table activity_logs enable row level security;
 
--- Helper function: only owner/admin/staff/technician may use internal records.
 create or replace function public.is_internal_user()
 returns boolean language sql stable security definer set search_path=public
 as $$
- select exists(select 1 from profiles p where p.id=auth.uid() and p.active=true and p.role in ('owner','admin','staff','technician'));
+ select exists(
+   select 1 from public.profiles p
+   where p.id=auth.uid() and p.active=true
+   and p.role in ('owner','admin','staff','technician')
+ );
 $$;
 
 create or replace function public.is_owner_admin()
 returns boolean language sql stable security definer set search_path=public
 as $$
- select exists(select 1 from profiles p where p.id=auth.uid() and p.active=true and p.role in ('owner','admin'));
+ select exists(
+   select 1 from public.profiles p
+   where p.id=auth.uid() and p.active=true
+   and p.role in ('owner','admin')
+ );
 $$;
 
+-- پرانی خطرناک public policies ختم کریں۔
 drop policy if exists "public tracking read" on service_jobs;
-create policy "public tracking read" on service_jobs for select to anon,authenticated using (true);
-
 drop policy if exists "public sales tracking read" on sales;
-create policy "public sales tracking read" on sales for select to anon,authenticated using (true);
 
+-- اندرونی جدولیں صرف مجاز لاگ اِن صارفین کے لیے۔
 drop policy if exists "internal customers" on customers;
-create policy "internal customers" on customers for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal customers" on customers for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal technicians" on technicians;
-create policy "internal technicians" on technicians for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal technicians" on technicians for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal service" on service_jobs;
-create policy "internal service" on service_jobs for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal service" on service_jobs for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal sales" on sales;
-create policy "internal sales" on sales for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal sales" on sales for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal payments" on payments;
-create policy "internal payments" on payments for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal payments" on payments for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal warranty" on warranties;
-create policy "internal warranty" on warranties for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal warranty" on warranties for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal inventory" on inventory;
-create policy "internal inventory" on inventory for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal inventory" on inventory for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal photos" on service_photos;
-create policy "internal photos" on service_photos for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal photos" on service_photos for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal locations" on live_locations;
-create policy "internal locations" on live_locations for all to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal locations" on live_locations for all to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
 drop policy if exists "internal logs" on activity_logs;
-create policy "internal logs" on activity_logs for select,insert to authenticated using (public.is_internal_user()) with check (public.is_internal_user());
+create policy "internal logs" on activity_logs for select,insert to authenticated
+using (public.is_internal_user()) with check (public.is_internal_user());
 
--- After creating the owner's Auth user, run:
--- insert into profiles(id,full_name,role) values ('OWNER_AUTH_USER_UUID','Owner','owner')
+-- View پر public access: صرف محدود columns ظاہر ہوں گے۔
+grant select on public.tracking_records to anon, authenticated;
+
+-- مالک کا Auth user بنانے کے بعد UUID یہاں ڈال کر یہ لائن الگ چلائیں:
+-- insert into public.profiles(id,full_name,role) values ('OWNER_AUTH_USER_UUID','Owner','owner')
 -- on conflict (id) do update set role='owner', active=true;
